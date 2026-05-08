@@ -21,18 +21,34 @@ def gen_prime(start=100, end=300):
             return p
 
 
-def egcd(a, b):
-    if b == 0:
-        return (a, 1, 0)
-    g, x1, y1 = egcd(b, a % b)
-    return (g, y1, x1 - (a // b) * y1)
+def gcd(a, b) -> bool:
+    """Return True if a and b are coprime (not sharing any factor >1).
+
+    This mirrors the simple method used in the notebooks: iterate
+    through possible divisors to check for a common factor.
+    """
+    if a > b:
+        for i in range(2, b + 1):
+            if a % i == 0 and b % i == 0:
+                return False
+    else:
+        for i in range(2, a + 1):
+            if a % i == 0 and b % i == 0:
+                return False
+    return True
 
 
 def modinv(a, m):
-    g, x, _ = egcd(a, m)
-    if g != 1:
-        return None
-    return x % m
+    """Find modular inverse d of a modulo m using brute-force search.
+
+    This follows the notebook approach: try successive d until
+    (a * d) % m == 1.
+    """
+    d = 1
+    while True:
+        d += 1
+        if (a * d) % m == 1:
+            return d
 
 
 class RSAKeyPair:
@@ -48,7 +64,7 @@ class RSAKeyPair:
 
         # choose e coprime with phi
         e = 3
-        while egcd(e, phi)[0] != 1:
+        while not gcd(e, phi):
             e += 2
 
         d = modinv(e, phi)
